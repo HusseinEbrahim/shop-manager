@@ -26,3 +26,28 @@ class ProductUpdate(BaseModel):
     stock_quantity: int | None = Field(default=None, ge=0)
     low_stock_threshold: int | None = Field(default=None, ge=0)
     supplier: str | None = None
+
+class SaleItemCreate(BaseModel):
+    product_id: int
+    quantity: int = Field(gt=0)
+
+class SaleCreate(BaseModel):
+    customer_name: str | None = Field(default=None, max_length=100)
+    items: list[SaleItemCreate] = Field(min_length=1)
+
+class SaleItemResponse(BaseModel):
+    product_id: int
+    quantity: int
+    unit_price: Decimal
+    line_total: Decimal
+
+    model_config = ConfigDict(from_attributes=True)
+
+class SaleResponse(BaseModel):
+    id: int
+    customer_name: str | None
+    total_amount: Decimal
+    created_at: datetime
+    items: list[SaleItemResponse]
+
+    model_config = ConfigDict(from_attributes=True)

@@ -44,5 +44,9 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    has_sales = db.query(models.SaleItem).filter(models.SaleItem.product_id == product_id).first()
+    if has_sales:
+        raise HTTPException(status_code=409, detail="Cannot delete a product with sales history")
+
     db.delete(product)
     db.commit()

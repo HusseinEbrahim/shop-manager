@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Numeric, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
 
@@ -13,3 +14,26 @@ class Product(Base):
     low_stock_threshold = Column(Integer, nullable=False, default=10)
     supplier = Column(String(100))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class Sale(Base):
+    __tablename__ = "sales"
+
+    id = Column(Integer, primary_key=True, index=True)
+    customer_name = Column(String(100))
+    total_amount = Column(Numeric(12, 2), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    items = relationship("SaleItem", back_populates="sale", cascade="all, delete-orphan")
+
+class SaleItem(Base):
+    __tablename__ = "sale_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sale_id = Column(Integer, ForeignKey("sales.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    unit_price = Column(Numeric(10, 2), nullable=False)
+    line_total = Column(Numeric(12, 2), nullable=False)
+
+    sale = relationship("Sale", back_populates="items")
+    product = relationship("Product")
