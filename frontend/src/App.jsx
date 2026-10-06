@@ -1,19 +1,21 @@
-import { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/Layout";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProductsPage from "./pages/ProductsPage";
+import SalesPage from "./pages/SalesPage";
 
 function App() {
-  const [message, setMessage] = useState("Loading...");
-
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/")
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch(() => setMessage("Could not reach the backend"));
-  }, []);
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-      <h1 className="text-3xl font-bold text-slate-800">{message}</h1>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/sales" element={<SalesPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
