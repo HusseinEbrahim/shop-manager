@@ -3,13 +3,22 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
+from auth import get_current_user
 import models
 import schemas
 
-router = APIRouter(prefix="/sales", tags=["Sales"])
+router = APIRouter(
+    prefix="/sales",
+    tags=["Sales"],
+    dependencies=[Depends(get_current_user)],
+)
 
 @router.post("/", response_model=schemas.SaleResponse, status_code=201)
-def create_sale(sale_in: schemas.SaleCreate, db: Session = Depends(get_db)):
+def create_sale(
+    sale_in: schemas.SaleCreate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
     # Combine duplicates (e.g. the same product listed twice)
     quantities = defaultdict(int)
     for item in sale_in.items:
@@ -36,7 +45,11 @@ def create_sale(sale_in: schemas.SaleCreate, db: Session = Depends(get_db)):
                 detail=f"Not enough stock for {product.name}: {product.stock_quantity} available, {qty} requested",
             )
 
-    sale = models.Sale(customer_name=sale_in.customer_name, total_amount=Decimal("0"))
+    sale = models.Sale(
+        customer_name=sale_in.customer_name,
+        total_amount=Decimal("0"),
+        created_by_id=user.id,
+    )
     total = Decimal("0")
 
     for product_id, qty in quantities.items():

@@ -22,6 +22,8 @@ class Sale(Base):
     customer_name = Column(String(100))
     total_amount = Column(Numeric(12, 2), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_by_id = Column(Integer, ForeignKey("users.id"))
+    created_by = relationship("User")
 
     items = relationship("SaleItem", back_populates="sale", cascade="all, delete-orphan")
 

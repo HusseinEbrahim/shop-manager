@@ -45,13 +45,14 @@ class SaleItemResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class SaleResponse(BaseModel):
-    id: int
-    customer_name: str | None
-    total_amount: Decimal
-    created_at: datetime
-    items: list[SaleItemResponse]
+       id: int
+       customer_name: str | None
+       total_amount: Decimal
+       created_at: datetime
+       created_by_id: int | None
+       items: list[SaleItemResponse]
 
-    model_config = ConfigDict(from_attributes=True)
+       model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
