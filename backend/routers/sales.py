@@ -1,6 +1,7 @@
 from collections import defaultdict
 from decimal import Decimal
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
+from invoices import build_invoice_pdf
 from sqlalchemy.orm import Session
 from database import get_db
 from auth import get_current_user
@@ -82,3 +83,15 @@ def get_sale(sale_id: int, db: Session = Depends(get_db)):
     if sale is None:
         raise HTTPException(status_code=404, detail="Sale not found")
     return sale
+
+@router.get("/{sale_id}/invoice")
+def get_invoice(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.get(models.Sale, sale_id)
+    if sale is None:
+        raise HTTPException(status_code=404, detail="Sale not found")
+
+    return Response(
+        content=build_invoice_pdf(sale),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="invoice-{sale.id}.pdf"'},
+    )

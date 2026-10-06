@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-export async function apiRequest(path, { method = "GET", body } = {}) {
+export async function apiRequest(path, { method = "GET", body, responseType } = {}) {
   const token = localStorage.getItem("token");
   const isForm = body instanceof URLSearchParams;
 
@@ -25,5 +25,6 @@ export async function apiRequest(path, { method = "GET", body } = {}) {
   }
 
   if (res.status === 204) return null;
+  if (responseType === "blob") return res.blob();
   return res.json();
 }

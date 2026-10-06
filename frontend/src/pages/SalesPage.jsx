@@ -26,6 +26,20 @@ export default function SalesPage() {
     }
   }
 
+  async function downloadInvoice(saleId) {
+    try {
+      const blob = await apiRequest(`/sales/${saleId}/invoice`, { responseType: "blob" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoice-${saleId}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
   useEffect(() => {
     loadData();
   }, []);
@@ -49,17 +63,18 @@ export default function SalesPage() {
               <th className="px-4 py-3 font-medium">Items</th>
               <th className="px-4 py-3 font-medium">Sold by</th>
               <th className="px-4 py-3 font-medium text-right">Total</th>
+              <th className="px-4 py-3 font-medium text-right">Invoice</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {loading && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">Loading...</td>
+                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">Loading...</td>
               </tr>
             )}
             {!loading && sales.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-slate-500">No sales yet</td>
+                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">No sales yet</td>
               </tr>
             )}
             {sales.map((sale) => (
@@ -75,6 +90,14 @@ export default function SalesPage() {
                 <td className="px-4 py-3 text-slate-600">{sale.created_by?.username || "—"}</td>
                 <td className="px-4 py-3 text-right font-medium text-slate-800">
                   {formatMoney(sale.total_amount)}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <button
+                    onClick={() => downloadInvoice(sale.id)}
+                    className="text-slate-600 hover:text-slate-900 font-medium"
+                  >
+                    Download
+                  </button>
                 </td>
               </tr>
             ))}
