@@ -28,6 +28,18 @@ class ProductUpdate(BaseModel):
     low_stock_threshold: int | None = Field(default=None, ge=0)
     supplier: str | None = None
 
+class ProductSummary(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class UserSummary(BaseModel):
+    id: int
+    username: str
+
+    model_config = ConfigDict(from_attributes=True)
+
 class SaleItemCreate(BaseModel):
     product_id: int
     quantity: int = Field(gt=0)
@@ -38,6 +50,7 @@ class SaleCreate(BaseModel):
 
 class SaleItemResponse(BaseModel):
     product_id: int
+    product: ProductSummary
     quantity: int
     unit_price: Decimal
     line_total: Decimal
@@ -45,14 +58,15 @@ class SaleItemResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class SaleResponse(BaseModel):
-       id: int
-       customer_name: str | None
-       total_amount: Decimal
-       created_at: datetime
-       created_by_id: int | None
-       items: list[SaleItemResponse]
+    id: int
+    customer_name: str | None
+    total_amount: Decimal
+    created_at: datetime
+    created_by_id: int | None
+    created_by: UserSummary | None = None
+    items: list[SaleItemResponse]
 
-       model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=50)
