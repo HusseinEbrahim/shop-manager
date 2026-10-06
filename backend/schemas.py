@@ -70,3 +70,15 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class TopProduct(BaseModel):
+    product_id: int
+    name: str
+    units_sold: int
+    revenue: Decimal
+
+class DashboardSummary(BaseModel):
+    today_sales_total: Decimal
+    today_sales_count: int
+    low_stock_products: list[ProductResponse]
+    top_products: list[TopProduct]
